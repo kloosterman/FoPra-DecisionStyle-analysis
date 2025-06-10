@@ -1,10 +1,17 @@
 % Analysis start for Neurodose: SDT Type I and II, empiricist index
 % Detection task, intelligence test
+% add the analysis script folder to MATLAB path, so it knows where to
+% find it. Change this to your folder!
+scriptsfolder = '/Users/kloosterman/Library/CloudStorage/Dropbox/PROJECTS/Teaching/24-25SS/Fopra/1DecisionStyle/analysis';
+addpath(scriptsfolder)
 
-cd '/Users/kloosterman/Library/CloudStorage/Dropbox/PROJECTS/Teaching/24-25SS/Fopra/1DecisionStyle/data'/Neurodose/
+% go to the folder where the data is at. Change this to your folder!
+datafolder = '/Users/kloosterman/Library/CloudStorage/Dropbox/PROJECTS/Teaching/24-25SS/Fopra/1DecisionStyle/data/Neurodose/';
+cd(datafolder) 
+mkdir('preproc') % make a folder for the preprocessed data
 
 t = readtable('VP Neurodose Experiment.csv'); % read raw data into table
-missedtrials = string(t.key_resp1_keys) == ""; 
+missedtrials = string(t.key_resp1_keys) == ""; % empty string for no response
 t = t(not(missedtrials), :); % remove missed trials from raw data
 
 signalpresence = string(t.condition_type) == "with_circles"; % 0 for target absent, 1 for target present
@@ -12,7 +19,10 @@ response = string(t.key_resp1_keys) == "d"; % d was pressed for reporting target
 
 out_table = table(); % make a new table with the output variables of interest
 out_table.VPcode = unique(string(t.VP_Code_bitteEINGEBEN___1_ErsteBuchstabeDesVornamensDerMutter_z));
-out_table.nmissedresponses = sum(missedtrials); % how often did the subject not press?
+out_table.nmissedresponses = sum(missedtrials); % how often did the subject not press? Keep track
+if out_table.nmissedresponses > 30
+  warning('More than 30 missed trials! Reomve this subject?')
+end
 out_table.accuracy = mean(signalpresence == response); % proportion correct
 
 % compute dprime and criterion Type I
@@ -49,3 +59,5 @@ out_table.empiricist_index = (1 - out_table.confidence) * out_table.TypeII_dprim
 % for a subject who does just that. Therefore higher EI score means more
 % empiricist
 disp(out_table)
+% save table as csv to the preproc folder, use VPcode as the filename
+writetable(out_table, fullfile(datafolder, 'preproc', append(VPcode, ".csv")))
