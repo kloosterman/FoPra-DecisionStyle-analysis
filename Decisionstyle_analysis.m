@@ -2,6 +2,7 @@
 % Detection task, intelligence test
 % add the analysis script folder to MATLAB path, so it knows where to
 % find it. Change this to your folder!
+clear; restoredefaultpath
 scriptsfolder = '/Users/kloosterman/Library/CloudStorage/Dropbox/PROJECTS/Teaching/24-25SS/Fopra/1DecisionStyle/analysis';
 addpath(scriptsfolder)
 
@@ -60,4 +61,4 @@ out_table.empiricist_index = (1 - out_table.confidence) * out_table.TypeII_dprim
 % empiricist
 disp(out_table)
 % save table as csv to the preproc folder, use VPcode as the filename
-writetable(out_table, fullfile(datafolder, 'preproc', append(VPcode, ".csv")))
+writetable(out_table, fullfile(datafolder, 'preproc', append(out_table.VPcode, ".csv")))
