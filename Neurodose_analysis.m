@@ -1,5 +1,6 @@
-% Analysis start for Neurodose: SDT Type I and II, empiricist index
-% Detection task, intelligence test
+% Analysis start for Neurodose SocSciSurvey data: SDT Type I and II,
+% empiricist index on intelligence test data!
+
 % add the analysis script folder to MATLAB path, so it knows where to
 % find it. Change this to your folder!
 clear; restoredefaultpath
@@ -11,7 +12,7 @@ datafolder = '/Users/kloosterman/Library/CloudStorage/Dropbox/PROJECTS/Teaching/
 cd(datafolder) 
 mkdir('preproc') % make a folder for the preprocessed data
 
-t = readtable('VP Neurodose Experiment.csv'); % read raw data into table
+t = readtable('VP Neurodose ScoSci Survey.xlsx'); % read raw data into table
 missedtrials = string(t.key_resp1_keys) == ""; % empty string for no response
 t = t(not(missedtrials), :); % remove missed trials from raw data
 
@@ -53,22 +54,12 @@ type_II_false_alarm_rate = high_conf_incorrect / (high_conf_incorrect + low_conf
 type_II_hit_rate = max(min(type_II_hit_rate, 1 - eps), eps);
 type_II_false_alarm_rate = max(min(type_II_false_alarm_rate, 1 - eps), eps);
 
-out_table.TypeII_dprime = norminv(type_II_hit_rate) - norminv(type_II_false_alarm_rate); % AKA Meta-dprime, see Fleming and Lau (2014)
-out_table.metacog_efficiency = out_table.TypeII_dprime / out_table.TypeI_dprime; % Meta-dprime normalized by objective performance, see Fleming and Lau (2014)
-
+out_table.TypeII_dprime = norminv(type_II_hit_rate) - norminv(type_II_false_alarm_rate);
 out_table.confidence = sum(t.confidence == "High") / height(t); % confidence 0 to 1, 1 means only high confidence responses
 out_table.empiricist_index = (1 - out_table.confidence) * out_table.TypeII_dprime; 
 % Explanation: Empiricist will have high TypeII dprime and also low confidence. The 1 - confidence will boost the score
-% for a subject who does just that. Therefore higher EI score means more empiricist
-out_table.empiricist_index_efficiency = (1 - out_table.confidence) * out_table.metacog_efficiency; 
-% Explanation: metacog_efficiency instead of TypeII_dprime, to control for
-% objective sensitivity differences between subjects.
-out_table.empiricist_index_efficiency_log = (1 - out_table.confidence) * -log(out_table.metacog_efficiency); 
-% Explanation:  when the denominator (d′) is small, meta-d′/d′ can give rather extreme values which may undermine 
-% power in a groupstatistical analysis. However, this problem can also be addressedby taking log of meta- d′/d′, 
-% as is often done to correct for the non-normality of ratio measures
-% (Howell, 2009). we take -log to make the values positive.
-
+% for a subject who does just that. Therefore higher EI score means more
+% empiricist
 disp(out_table)
 % save table as csv to the preproc folder, use VPcode as the filename
 writetable(out_table, fullfile(datafolder, 'preproc', append(out_table.VPcode, ".csv")))
