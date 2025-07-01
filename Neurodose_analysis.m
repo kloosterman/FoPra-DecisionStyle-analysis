@@ -11,8 +11,9 @@ addpath(scriptsfolder)
 datafolder = '/Users/kloosterman/Library/CloudStorage/Dropbox/PROJECTS/Teaching/24-25SS/Fopra/1DecisionStyle/data/Neurodose/';
 cd(datafolder) 
 mkdir('preproc') % make a folder for the preprocessed data
+cd raw
 
-t = readtable('VP Neurodose ScoSci Survey.xlsx'); % read raw data into table
+t = readtable('NEU Neurodose ScoSci Survey (101 VP)'); % read raw data into table TODO get correct answers!
 missedtrials = string(t.key_resp1_keys) == ""; % empty string for no response
 t = t(not(missedtrials), :); % remove missed trials from raw data
 
